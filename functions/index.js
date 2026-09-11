@@ -7,7 +7,7 @@ import { GoogleGenAI } from "@google/genai";
 initializeApp();
 const db = getFirestore();
 const geminiApiKey = defineSecret("GEMINI_API_KEY");
-const geminiModel = defineString("GEMINI_MODEL", { default: "gemini-3.7-flash" });
+const geminiModel = defineString("GEMINI_MODEL", { default: "gemini-3.8-flash" });
 
 const SYSTEM_INSTRUCTION = `You are CivicAI Governance, an AI-assisted public-service triage system for India.
 Analyze citizen reports conservatively. Never invent facts, legal claims, addresses, or emergency instructions.
