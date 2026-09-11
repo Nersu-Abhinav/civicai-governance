@@ -1,0 +1,10 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Citizen reports are written by the trusted Cloud Function.
+    // Public browser access is denied until an authenticated official workflow is added.
+    match /civicReports/{reportId} {
+      allow read, write: if false;
+    }
+  }
+}
