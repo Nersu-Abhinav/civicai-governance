@@ -3,78 +3,146 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="description" content="CivicAI Governance — multilingual AI-assisted citizen intelligence for public services." />
-  <meta name="theme-color" content="#0b57d0" />
+  <meta name="description" content="CivicAI Governance — JanMitra, an explainable multilingual civic intelligence command center." />
+  <meta name="theme-color" content="#07111f" />
   <link rel="manifest" href="manifest.webmanifest" />
   <title>CivicAI Governance — JanMitra</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <header class="topbar">
-    <div class="brand"><span class="brand-mark">✦</span><div><strong>CivicAI</strong><small>Governance · JanMitra</small></div></div>
-    <span class="track-pill">Track 1 · Digital Public Infrastructure & Governance</span>
-    <div class="status"><span class="dot"></span> <span id="modeLabel">Prototype mode</span></div>
-  </header>
-
-  <main class="container">
-    <section class="hero">
-      <div>
-        <p class="eyebrow">AI-ASSISTED CIVIC INTELLIGENCE</p>
-        <h1>Turn citizen voices into <span>actionable priorities.</span></h1>
-        <p class="hero-copy">A multilingual, multimodal workflow for understanding citizen requests, routing them to the right service, and giving officials an explainable view of community priorities.</p>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-mark">✦</div>
+        <div><strong>Civic<span>AI</span></strong><small>Governance · JanMitra</small></div>
       </div>
-      <div class="hero-card"><div class="metric"><b id="totalIssues">0</b><span>reports analyzed</span></div><div class="metric"><b id="urgentIssues">0</b><span>high-priority</span></div><div class="metric"><b id="departments">0</b><span>service areas</span></div></div>
-    </section>
+      <div class="sidebar-label">COMMAND CENTER</div>
+      <nav class="nav">
+        <button class="nav-item active" data-view="overview"><span>⌂</span> Overview</button>
+        <button class="nav-item" data-view="intake"><span>＋</span> Citizen intake</button>
+        <button class="nav-item" data-view="priorities"><span>◈</span> Priority intelligence</button>
+        <button class="nav-item" data-view="queue"><span>≡</span> Department queue</button>
+        <button class="nav-item" data-view="governance"><span>◉</span> AI governance</button>
+      </nav>
+      <div class="sidebar-spacer"></div>
+      <div class="trust-card">
+        <div class="trust-icon">✓</div>
+        <div><strong>Human-governed AI</strong><small>Recommendations never make final administrative decisions.</small></div>
+      </div>
+      <div class="sidebar-foot"><span class="live-dot"></span> Prototype environment <span>·</span> Synthetic data</div>
+    </aside>
 
-    <section class="grid">
-      <article class="panel intake">
-        <div class="panel-head"><div><p class="eyebrow">CITIZEN INTAKE</p><h2>Report a community issue</h2></div><span class="ai-badge">GEMINI READY</span></div>
-        <label for="message">Message</label>
-        <textarea id="message" rows="5" placeholder="Describe the issue in English or an Indian language..."></textarea>
-        <div class="row">
-          <div><label for="language">Language</label><select id="language"><option>Auto-detect</option><option>English</option><option>Hindi</option><option>Telugu</option><option>Tamil</option><option>Kannada</option><option>Marathi</option></select></div>
-          <div><label for="location">Location</label><input id="location" placeholder="e.g. Ward 12, Hyderabad" /></div>
+    <div class="main-shell">
+      <header class="topbar">
+        <div class="mobile-brand"><div class="brand-mark">✦</div><strong>CivicAI</strong></div>
+        <div class="breadcrumbs"><span>JanMitra</span><b>/</b><strong id="pageTitle">Civic intelligence overview</strong></div>
+        <div class="top-actions">
+          <span class="track-pill">TRACK 1 · DPI & GOVERNANCE</span>
+          <span class="system-status"><i></i><span id="modeLabel">Prototype fallback</span></span>
+          <button class="icon-btn" id="helpButton" title="About CivicAI">?</button>
         </div>
-        <div class="upload"><span>📷</span><div><strong>Photo evidence</strong><small id="fileName">Optional · JPG, PNG or WebP</small></div><label class="secondary upload-button" for="photoInput">Attach</label><input id="photoInput" type="file" accept="image/png,image/jpeg,image/webp" hidden /></div>
-        <button class="primary" id="analyzeButton" onclick="analyzeIssue()">Analyze with CivicAI <span>→</span></button>
-        <p class="fineprint">Live mode sends the report to a secure Firebase function and Gemini. The Gemini API key is kept server-side. If the backend is not configured, the demo safely falls back to local synthetic analysis.</p>
-      </article>
+      </header>
 
-      <article class="panel analysis">
-        <div class="panel-head"><div><p class="eyebrow">AI ANALYSIS</p><h2>Explainable recommendation</h2></div><span id="confidence" class="confidence">Waiting</span></div>
-        <div id="emptyState" class="empty"><div>✦</div><h3>Submit a citizen report</h3><p>The AI analysis will appear here with category, priority, routing, and an explanation.</p></div>
-        <div id="result" class="result hidden">
-          <div class="summary"><span>AI SUMMARY</span><p id="summary"></p></div>
-          <div class="result-grid">
-            <div><span>Category</span><strong id="category"></strong></div>
-            <div><span>Recommended department</span><strong id="department"></strong></div>
-            <div><span>Priority</span><strong id="priority"></strong></div>
-            <div><span>Detected language</span><strong id="detectedLanguage"></strong></div>
+      <main class="content">
+        <section class="hero-block" id="overviewView">
+          <div class="hero-copy-wrap">
+            <div class="eyebrow"><span class="spark">✦</span> AI-ASSISTED CIVIC INTELLIGENCE</div>
+            <h1>From citizen voice to <span>public action.</span></h1>
+            <p>JanMitra turns multilingual text, voice, images and location context into explainable service intelligence — helping public teams see what matters, where it matters, and why.</p>
+            <div class="hero-actions">
+              <button class="primary compact" onclick="focusIntake()">Report an issue <span>→</span></button>
+              <button class="ghost" onclick="scrollToSection('prioritySection')">Explore priorities <span>↓</span></button>
+            </div>
           </div>
-          <div class="reason"><strong>Why this priority?</strong><p id="reason"></p></div>
-          <div class="tags" id="tags"></div>
-          <div class="signals" id="signals"></div>
-        </div>
-      </article>
-    </section>
+          <div class="hero-insight">
+            <div class="insight-top"><span>COMMUNITY SIGNAL</span><b>● Live prototype</b></div>
+            <div class="insight-main"><strong id="heroSignal">Water supply disruption</strong><span>is currently the strongest service signal</span></div>
+            <div class="signal-meter"><i id="heroMeter"></i></div>
+            <div class="insight-foot"><span>Confidence <b>88%</b></span><span>Cluster <b>Ward 7</b></span><span>Review <b>Priority</b></span></div>
+          </div>
+        </section>
 
-    <section class="panel dashboard">
-      <div class="panel-head"><div><p class="eyebrow">OFFICIAL VIEW</p><h2>Community priorities</h2></div><button class="secondary" onclick="resetDemo()">Reset demo</button></div>
-      <div class="dashboard-grid">
-        <div class="chart-card"><h3>Priority queue</h3><div id="priorityBars"></div></div>
-        <div class="chart-card"><h3>Service areas</h3><div id="departmentBars"></div></div>
-        <div class="chart-card"><h3>Recent reports</h3><div id="recentReports"></div></div>
-      </div>
-    </section>
+        <section class="kpi-grid" aria-label="Civic intelligence metrics">
+          <article class="kpi-card"><div class="kpi-icon blue">◉</div><div><span>REPORTS ANALYZED</span><strong id="totalIssues">0</strong><small><em>+12%</em> vs previous period</small></div></article>
+          <article class="kpi-card"><div class="kpi-icon red">!</div><div><span>HIGH-PRIORITY SIGNALS</span><strong id="urgentIssues">0</strong><small><em>3</em> need rapid review</small></div></article>
+          <article class="kpi-card"><div class="kpi-icon purple">◇</div><div><span>SERVICE AREAS</span><strong id="departments">0</strong><small><em>4</em> departments active</small></div></article>
+          <article class="kpi-card"><div class="kpi-icon green">✓</div><div><span>AI CONFIDENCE</span><strong id="avgConfidence">86%</strong><small><em>Human review</em> when uncertain</small></div></article>
+        </section>
 
-    <section class="principles">
-      <div><b>Human in the loop</b><span>AI recommends; authorized officials decide.</span></div>
-      <div><b>Privacy by design</b><span>Public dashboards should expose trends, not personal data.</span></div>
-      <div><b>Explainable AI</b><span>Every priority recommendation has visible signals.</span></div>
-      <div><b>Inclusive access</b><span>Designed for multilingual and voice-first participation.</span></div>
-    </section>
-  </main>
-  <footer>© 2026 CivicAI Governance · Hackathon prototype · Synthetic data only</footer>
+        <section class="workspace-grid" id="intakeSection">
+          <article class="surface intake-surface">
+            <div class="section-head">
+              <div><div class="eyebrow">01 · CITIZEN INTAKE</div><h2>Give the city a signal</h2><p>Report naturally. JanMitra structures the issue without forcing citizens through forms.</p></div>
+              <span class="ai-chip"><i></i> GEMINI READY</span>
+            </div>
+            <div class="quick-prompts"><span>Try a scenario</span><button onclick="usePrompt('Large pothole near our college gate is causing dangerous traffic for students.','Ward 12, Hyderabad')">Road safety</button><button onclick="usePrompt('There has been no water supply since yesterday for many houses in our lane.','Ward 7, Hyderabad')">Water outage</button><button onclick="usePrompt('Garbage has been piling up beside the market for three days.','Ward 12, Hyderabad')">Waste hotspot</button></div>
+            <div class="input-label-row"><label for="message">Citizen message</label><span id="charCount">0 / 500</span></div>
+            <div class="message-box">
+              <textarea id="message" maxlength="500" rows="6" placeholder="Type in English or an Indian language… e.g. ‘There is no water in our street since yesterday.’"></textarea>
+              <div class="message-tools"><span>🔒 No personal data required</span><button id="voiceButton" class="tool-btn" title="Use voice input">🎙 Voice</button></div>
+            </div>
+            <div class="form-grid">
+              <div><label for="language">Language</label><select id="language"><option>Auto-detect</option><option>English</option><option>Hindi</option><option>Telugu</option><option>Tamil</option><option>Kannada</option><option>Marathi</option></select></div>
+              <div><label for="location">Location / ward</label><div class="location-field"><input id="location" placeholder="e.g. Ward 12, Hyderabad" /><button id="locationButton" title="Use current location">⌖</button></div></div>
+            </div>
+            <div class="evidence-row">
+              <div class="evidence-preview" id="photoPreview"><div class="camera">▣</div><div><strong>Visual evidence</strong><small id="fileName">Optional · JPG, PNG or WebP</small></div></div>
+              <label class="secondary upload-button" for="photoInput">Attach photo</label><input id="photoInput" type="file" accept="image/png,image/jpeg,image/webp" hidden />
+            </div>
+            <div class="consent-row"><span class="check">✓</span><span>Use this report for civic triage and aggregate service insights. No identity is required.</span><button class="info-dot" title="Privacy by design">i</button></div>
+            <button class="primary analyze-btn" id="analyzeButton" onclick="analyzeIssue()"><span>✦</span> Analyze with CivicAI <b>Ctrl + Enter</b><span>→</span></button>
+            <div class="security-strip"><span>◉</span> <b>Safe by design</b><span>·</span> AI recommends, authorized officials decide <span>·</span> Synthetic demo data</div>
+          </article>
+
+          <article class="surface intelligence-surface" id="analysisPanel">
+            <div class="section-head"><div><div class="eyebrow">02 · CIVIC INTELLIGENCE</div><h2>Explainable decision support</h2></div><span id="confidence" class="confidence">Waiting</span></div>
+            <div id="emptyState" class="intelligence-empty"><div class="orb">✦</div><h3>Ready for a citizen signal</h3><p>Submit a report to see classification, impact, duplicate signals, department routing and the reasoning behind the recommendation.</p><div class="empty-pills"><span>Intent</span><span>Impact</span><span>Routing</span><span>Explainability</span></div></div>
+            <div id="result" class="result hidden">
+              <div class="decision-banner"><div><span>RECOMMENDATION</span><strong id="recommendation">Priority review</strong><small id="decisionMeta">AI triage signal · human verification required</small></div><div class="score-ring" id="scoreRing"><b id="scoreValue">88</b><span>confidence</span></div></div>
+              <div class="summary"><span>AI-GENERATED CASE BRIEF</span><p id="summary"></p></div>
+              <div class="decision-grid">
+                <div class="decision-cell"><span>Issue class</span><strong id="category"></strong><small>Detected intent</small></div>
+                <div class="decision-cell"><span>Recommended route</span><strong id="department"></strong><small>Service owner</small></div>
+                <div class="decision-cell"><span>Priority</span><strong id="priority" class="priority-value"></strong><small id="slaText">Review window</small></div>
+                <div class="decision-cell"><span>Language</span><strong id="detectedLanguage"></strong><small>Detected / selected</small></div>
+              </div>
+              <div class="impact-grid"><div><span>COMMUNITY IMPACT</span><strong id="impactValue">Multi-household</strong></div><div><span>DUPLICATE / CLUSTER SIGNAL</span><strong id="duplicateValue">Likely cluster</strong></div><div><span>HUMAN REVIEW</span><strong id="reviewValue">Recommended</strong></div></div>
+              <div class="reason"><div class="reason-title"><span>WHY THIS RECOMMENDATION?</span><b>Explainable signal chain</b></div><p id="reason"></p><div class="signals" id="signals"></div></div>
+              <div class="tags" id="tags"></div>
+              <div class="next-actions"><span>Suggested next actions</span><button>Review case</button><button>View cluster</button><button>Assign route</button></div>
+            </div>
+          </article>
+        </section>
+
+        <section class="section-block" id="prioritySection">
+          <div class="section-title"><div><div class="eyebrow">03 · PRIORITY INTELLIGENCE</div><h2>See the city as signals, not spreadsheets.</h2><p>Aggregated synthetic reports reveal emerging service pressure across wards and departments.</p></div><div class="legend"><span><i class="high"></i>High</span><span><i class="medium"></i>Medium</span><span><i class="low"></i>Low</span></div></div>
+          <div class="analytics-grid">
+            <article class="surface map-card"><div class="card-title"><div><h3>Ward signal map</h3><span>Relative issue density · synthetic demo</span></div><button class="mini-btn">Last 24h ▾</button></div><div class="map-visual" id="mapVisual"><div class="map-label ward-a">WARD 7 <b>HIGH</b></div><div class="map-label ward-b">WARD 12 <b>HIGH</b></div><div class="map-label ward-c">WARD 4 <b>LOW</b></div><div class="map-road r1"></div><div class="map-road r2"></div><div class="map-road r3"></div><div class="map-pin pin-a">!</div><div class="map-pin pin-b">!</div><div class="map-pin pin-c">•</div><div class="map-legend"><span><i class="hot"></i>Signal cluster</span><span><i class="cool"></i>Low activity</span></div></div></article>
+            <article class="surface priority-card"><div class="card-title"><div><h3>Priority queue</h3><span>What deserves attention first</span></div><span class="tiny-status">AI-ranked</span></div><div id="priorityBars" class="priority-list"></div></article>
+            <article class="surface trend-card"><div class="card-title"><div><h3>Service pressure</h3><span>Distribution by department</span></div></div><div id="departmentBars" class="priority-list"></div><div class="trend-foot"><span>Most active</span><strong id="topDepartment">Water Services</strong></div></article>
+          </div>
+        </section>
+
+        <section class="section-block" id="queueSection">
+          <div class="section-title"><div><div class="eyebrow">04 · DEPARTMENT QUEUE</div><h2>From AI triage to accountable action.</h2><p>Every recommendation carries a route, rationale and review state.</p></div><button class="secondary" onclick="resetDemo()">Reset synthetic demo</button></div>
+          <article class="surface table-card"><div class="table-toolbar"><div class="search-box">⌕ <input id="reportSearch" placeholder="Search case, ward or service…" /></div><div class="filter-pills"><button class="active">All</button><button>High</button><button>Medium</button><button>Low</button></div></div><div class="case-table"><div class="table-head"><span>CASE</span><span>SERVICE</span><span>LOCATION</span><span>PRIORITY</span><span>AI CONFIDENCE</span><span>STATUS</span></div><div id="recentReports"></div></div></article>
+        </section>
+
+        <section class="section-block" id="governanceSection">
+          <div class="section-title"><div><div class="eyebrow">05 · RESPONSIBLE AI</div><h2>Built for public-sector trust.</h2><p>The system is designed to assist accountable teams — not replace them.</p></div></div>
+          <div class="governance-grid">
+            <article class="governance-card"><div class="gov-icon">◎</div><h3>Human-in-the-loop</h3><p>Low-confidence or sensitive cases are explicitly flagged for authorized review before action.</p><span>Decision safeguard</span></article>
+            <article class="governance-card"><div class="gov-icon">⌁</div><h3>Explainable prioritization</h3><p>Every recommendation exposes the signals that influenced category, urgency and routing.</p><span>Auditable reasoning</span></article>
+            <article class="governance-card"><div class="gov-icon">◌</div><h3>Privacy by design</h3><p>Identity is optional, public views use aggregated trends, and the demo uses synthetic citizen data.</p><span>Data minimization</span></article>
+            <article class="governance-card"><div class="gov-icon">◈</div><h3>Inclusive by default</h3><p>Text, voice, image and multilingual intake reduce barriers to participating in civic systems.</p><span>Accessible participation</span></article>
+          </div>
+        </section>
+      </main>
+      <footer><strong>CivicAI Governance · JanMitra</strong><span>Built for Build with AI: Code for Communities · Track 1</span><span>Prototype · Synthetic data only</span></footer>
+    </div>
+  </div>
+  <div class="toast" id="toast"><span>✓</span><div><strong id="toastTitle">Ready</strong><small id="toastText"></small></div></div>
+  <div class="modal hidden" id="helpModal"><div class="modal-card"><button class="modal-close" id="modalClose">×</button><div class="eyebrow">ABOUT JANMITRA</div><h2>A civic intelligence layer for public services.</h2><p>JanMitra transforms citizen voice into structured, explainable signals that can support service teams. The prototype demonstrates multilingual intake, multimodal evidence, AI-assisted triage, clustering, routing and responsible-AI safeguards.</p><div class="modal-grid"><span>01 <b>Understand</b></span><span>02 <b>Prioritize</b></span><span>03 <b>Route</b></span><span>04 <b>Review</b></span></div></div></div>
   <script src="app.js"></script>
 </body>
 </html>
