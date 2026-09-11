@@ -1,0 +1,38 @@
+{
+  "functions": {
+    "source": "functions",
+    "runtime": "nodejs22"
+  },
+  "hosting": {
+    "public": ".",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**",
+      "functions/**",
+      "docs/**"
+    ],
+    "rewrites": [
+      {
+        "source": "/api/analyzeIssue",
+        "function": {
+          "functionId": "analyzeIssue",
+          "region": "asia-south1"
+        }
+      },
+      {
+        "source": "/api/health",
+        "function": {
+          "functionId": "health",
+          "region": "asia-south1"
+        }
+      }
+    ],
+    "cleanUrls": true,
+    "trailingSlash": false
+  },
+  "firestore": {
+    "rules": "firestore.rules",
+    "indexes": "firestore.indexes.json"
+  }
+}
