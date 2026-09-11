@@ -1,52 +1,71 @@
-# Gemini Integration Plan
+# Gemini Integration
 
-The repository's current browser prototype intentionally uses local synthetic analysis. The production/hackathon AI path should move model calls to a secure server-side service.
+CivicAI now includes a server-side Gemini integration. The browser never contains the Gemini API key.
 
-## Recommended flow
+## Request flow
 
 ```text
-Browser → Civic API → Gemini → structured JSON → validation → Firestore → dashboard
+Browser
+  -> POST /api/analyzeIssue
+  -> Firebase Hosting rewrite
+  -> Cloud Function `analyzeIssue`
+  -> Gemini
+  -> structured JSON
+  -> Firestore
+  -> Browser
 ```
 
-## Model contract
+## Structured model contract
 
-Ask Gemini to return only a validated JSON object with:
+The function requests a JSON object containing:
 
-- `language`
-- `category`
 - `summary`
-- `location`
-- `urgency`
-- `impact`
-- `recommended_department`
+- `category`
+- `department`
+- `priority`
+- `language`
 - `confidence`
-- `reasoning_signals`
+- `reason`
+- `tags`
+- `humanReview`
+- `signals`
 
-The backend should reject malformed output and send low-confidence cases to human review.
+Structured output makes the frontend deterministic and easier to evaluate than parsing free-form model text.
 
-## Safety requirements
+## Multimodal input
 
-- Never put the Gemini API key in `index.html`, `app.js`, or any client-side bundle.
-- Validate and constrain model output before storing it.
-- Treat citizen text and uploaded media as untrusted input.
-- Use allow-listed departments/categories rather than arbitrary model-generated routing destinations.
-- Keep personally identifying information out of aggregate analytics.
-- Log model version/configuration and human overrides for evaluation.
+The frontend can send a supported image as base64 inline data together with the citizen message. The function forwards it to Gemini for multimodal analysis.
 
-## Evaluation before live data
+For production, add explicit upload-size limits, malware/content scanning, retention rules, and a consent/notice flow before accepting arbitrary public uploads.
 
-Build a labeled synthetic test set covering:
+## Safety behavior
 
-1. English + major Indian languages targeted by the pilot.
-2. Ambiguous requests.
-3. Duplicate reports.
-4. Urgent safety issues.
-5. Spam and abusive inputs.
-6. Prompt-injection attempts.
-7. Images that are irrelevant or unsafe.
+The backend:
 
-Measure category accuracy, routing accuracy, false-high-priority rate, multilingual quality, and human correction rate.
+- uses a low temperature for consistent triage;
+- requests structured JSON output;
+- clamps confidence to `[0, 1]`;
+- forces human review when confidence is below the configured threshold;
+- treats AI as decision support rather than an autonomous government decision-maker;
+- returns a generic error instead of leaking internal exceptions;
+- stores the Gemini key as a Firebase secret.
 
-## Production note
+## Model configuration
 
-The prototype is deliberately usable without an API key. This allows the demo UI to remain safe to publish while the secure Gemini integration is developed separately.
+The default model is configured through the `GEMINI_MODEL` Firebase parameter in `functions/index.js`. Keeping the model configurable allows the project to track the currently supported Gemini Flash model without changing frontend code.
+
+## Evaluation before real data
+
+Create a labeled synthetic test set across roads, water, sanitation, electricity, education, transport, and general services. Include multilingual, ambiguous, duplicate, urgent, abusive, irrelevant-image, and prompt-injection cases.
+
+Measure:
+
+- classification accuracy
+- department-routing accuracy
+- false-high-priority rate
+- multilingual quality
+- hallucination rate
+- latency
+- human correction rate
+
+The public prototype remains usable without a configured backend because `app.js` has a deterministic local fallback.
