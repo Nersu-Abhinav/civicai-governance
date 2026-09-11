@@ -1,98 +1,33 @@
-const seedReports = [
-  {id:'CIV-1042',category:'Roads & Mobility',department:'Roads Department',priority:'High',location:'Ward 12',summary:'Multiple residents report a large pothole near the main junction.',tags:['pothole','safety','cluster']},
-  {id:'CIV-1041',category:'Water Supply',department:'Water Services',priority:'High',location:'Ward 7',summary:'Households report an interruption in water supply since yesterday.',tags:['water','service disruption']},
-  {id:'CIV-1040',category:'Waste Management',department:'Sanitation',priority:'Medium',location:'Ward 12',summary:'Repeated garbage accumulation reported near a community market.',tags:['waste','hotspot']},
-  {id:'CIV-1039',category:'Street Lighting',department:'Electrical Services',priority:'Low',location:'Ward 4',summary:'Two streetlights are not functioning on a residential lane.',tags:['lighting']}
+const seedReports=[
+{id:'CIV-1042',category:'Roads & Mobility',department:'Roads Department',priority:'High',location:'Ward 12',summary:'Multiple residents report a large pothole near the main junction.',tags:['pothole','safety','cluster'],confidence:.93,impact:'High public-safety impact',status:'Needs review'},
+{id:'CIV-1041',category:'Water Supply',department:'Water Services',priority:'High',location:'Ward 7',summary:'Households report an interruption in water supply since yesterday.',tags:['water','service disruption','cluster'],confidence:.91,impact:'Multi-household',status:'Priority review'},
+{id:'CIV-1040',category:'Waste Management',department:'Sanitation',priority:'Medium',location:'Ward 12',summary:'Repeated garbage accumulation reported near a community market.',tags:['waste','hotspot'],confidence:.86,impact:'Community-level',status:'Queued'},
+{id:'CIV-1039',category:'Street Lighting',department:'Electrical Services',priority:'Low',location:'Ward 4',summary:'Two streetlights are not functioning on a residential lane.',tags:['lighting'],confidence:.89,impact:'Localized',status:'Queued'},
+{id:'CIV-1038',category:'Water Supply',department:'Water Services',priority:'High',location:'Ward 7',summary:'Low water pressure reported by households across the same lane.',tags:['pressure','water','cluster'],confidence:.88,impact:'Multi-household',status:'Priority review'}
 ];
-
-let reports = [...seedReports];
-
-const rules = [
-  {keys:['pothole','road','street','traffic','accident'],category:'Roads & Mobility',department:'Roads Department',priority:'High',reason:'Potential public-safety impact combined with transport disruption makes this suitable for high-priority review.'},
-  {keys:['water','pipeline','drinking','tap','supply'],category:'Water Supply',department:'Water Services',priority:'High',reason:'A disruption to an essential service can affect multiple households and should be reviewed quickly.'},
-  {keys:['garbage','waste','trash','dump','sanitation'],category:'Waste Management',department:'Sanitation',priority:'Medium',reason:'Recurring sanitation issues can create community-level impact; the recommendation is medium until severity is verified.'},
-  {keys:['light','streetlight','electricity','lamp'],category:'Street Lighting',department:'Electrical Services',priority:'Low',reason:'The issue appears localized. Priority can increase if safety impact or a wider outage is confirmed.'},
-  {keys:['school','student','classroom','teacher'],category:'Education',department:'Education Services',priority:'Medium',reason:'Education-service disruption can affect a defined community and merits timely departmental review.'}
+let reports=[...seedReports];
+const rules=[
+{keys:['pothole','road','street','traffic','accident','footpath','bridge'],category:'Roads & Mobility',department:'Roads Department',priority:'High',reason:'Road-safety language and mobility disruption indicate a potentially urgent public-space issue. The system elevates it because injury or traffic impact should be verified quickly.',impact:'High public-safety impact',cluster:'Likely Ward 12 road cluster',duplicate:.78,sla:'Review within 4 hours',tags:['mobility','safety','road asset']},
+{keys:['water','pipeline','drinking','tap','supply','pressure','no water'],category:'Water Supply',department:'Water Services',priority:'High',reason:'Loss or degradation of an essential service can affect multiple households. The signal is ranked high while officials verify the affected area and service status.',impact:'Multi-household',cluster:'Likely Ward 7 service cluster',duplicate:.86,sla:'Review within 2 hours',tags:['water','essential service','cluster']},
+{keys:['garbage','waste','trash','dump','sanitation','litter'],category:'Waste Management',department:'Sanitation',priority:'Medium',reason:'A recurring sanitation signal can create community-level impact. Medium priority preserves room for escalation if duration, density or health risk is confirmed.',impact:'Community-level',cluster:'Possible market hotspot',duplicate:.69,sla:'Review within 24 hours',tags:['sanitation','hotspot','recurring']},
+{keys:['light','streetlight','electricity','lamp','dark'],category:'Street Lighting',department:'Electrical Services',priority:'Low',reason:'The language suggests a localized asset fault. The case can be escalated if multiple assets fail or a verified safety concern is reported.',impact:'Localized',cluster:'No strong cluster detected',duplicate:.28,sla:'Review within 72 hours',tags:['lighting','asset fault']},
+{keys:['school','student','classroom','teacher','college'],category:'Education',department:'Education Services',priority:'Medium',reason:'Education-service disruption affects a defined community. The recommendation stays medium until scope, duration and affected learners are verified.',impact:'Community-level',cluster:'Possible campus cluster',duplicate:.54,sla:'Review within 24 hours',tags:['education','students','service']},
+{keys:['drain','flood','sewage','sewer','overflow'],category:'Drainage & Flooding',department:'Stormwater Services',priority:'High',reason:'Flooding and drainage signals can create rapid safety and access impacts. The case is elevated for verification of severity and affected households.',impact:'High access/safety impact',cluster:'Possible drainage cluster',duplicate:.63,sla:'Review within 4 hours',tags:['drainage','flood risk','safety']}
 ];
-
-function setLoading(isLoading){
-  const button=document.getElementById('analyzeButton');
-  button.disabled=isLoading;
-  button.innerHTML=isLoading?'Analyzing securely… <span>✦</span>':'Analyze with CivicAI <span>→</span>';
-}
-
-function detectLanguage(text){
-  if(/[\u0C00-\u0C7F]/.test(text)) return 'Telugu';
-  if(/[\u0900-\u097F]/.test(text)) return 'Hindi';
-  if(/[\u0B80-\u0BFF]/.test(text)) return 'Tamil';
-  if(/[\u0C80-\u0CFF]/.test(text)) return 'Kannada';
-  return 'English';
-}
-
-function localAnalyze(message, location, language){
-  const lower=message.toLowerCase();
-  const match=rules.find(r=>r.keys.some(k=>lower.includes(k)))||{category:'General Public Service',department:'Citizen Services',priority:'Medium',reason:'The prototype could not confidently map this report to a specific service category, so human review is recommended.'};
-  const detected=language==='Auto-detect'?detectLanguage(message):language;
-  return {summary:`Citizen report from ${location}: ${message.length>135?message.slice(0,132)+'…':message}`,category:match.category,department:match.department,priority:match.priority,language:detected,confidence:match.category==='General Public Service'?0.55:0.88,reason:match.reason,tags:[match.category.toLowerCase(),detected.toLowerCase()],humanReview:match.category==='General Public Service',signals:[{name:'Source',value:'Local prototype fallback'},{name:'Safety',value:match.priority==='High'?'Review quickly':'Standard review'}]};
-}
-
-async function readImage(){
-  const file=document.getElementById('photoInput').files[0];
-  if(!file) return null;
-  return await new Promise((resolve,reject)=>{
-    const reader=new FileReader();
-    reader.onload=()=>resolve({data:String(reader.result).split(',')[1],mimeType:file.type});
-    reader.onerror=reject;
-    reader.readAsDataURL(file);
-  });
-}
-
-async function analyzeIssue(){
-  const message=document.getElementById('message').value.trim();
-  const location=document.getElementById('location').value.trim()||'Location not specified';
-  const language=document.getElementById('language').value;
-  if(!message){alert('Please enter a citizen report first.');return;}
-  setLoading(true);
-  try{
-    const image=await readImage();
-    let result=null;
-    try{
-      const response=await fetch('/api/analyzeIssue',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message,location,language,imageData:image?.data||'',imageMimeType:image?.mimeType||''})});
-      if(response.ok) result=await response.json();
-    }catch(_){/* Offline/local fallback */}
-    if(!result||result.error) result=localAnalyze(message,location,language);
-    const item={id:'CIV-'+(1043+reports.length),category:result.category,department:result.department,priority:result.priority,location,summary:result.summary,tags:result.tags||[]};
-    reports.unshift(item);
-    document.getElementById('emptyState').classList.add('hidden');
-    document.getElementById('result').classList.remove('hidden');
-    document.getElementById('confidence').textContent=result.humanReview?'Human review recommended':`${Math.round((result.confidence||0)*100)}% confidence`;
-    document.getElementById('summary').textContent=result.summary;
-    document.getElementById('category').textContent=result.category;
-    document.getElementById('department').textContent=result.department;
-    document.getElementById('priority').textContent=result.priority;
-    document.getElementById('detectedLanguage').textContent=result.language;
-    document.getElementById('reason').textContent=result.reason;
-    document.getElementById('tags').innerHTML=(result.tags||[]).map(t=>`<span class="tag">#${t}</span>`).join('');
-    document.getElementById('signals').innerHTML=(result.signals||[]).map(s=>`<div class="signal"><span>${s.name}</span><b>${s.value}</b></div>`).join('');
-    document.getElementById('modeLabel').textContent=result.id?'Live Gemini + Firebase':'Prototype fallback';
-    renderDashboard();
-  }finally{setLoading(false);}
-}
-
-function renderDashboard(){
-  document.getElementById('totalIssues').textContent=reports.length;
-  document.getElementById('urgentIssues').textContent=reports.filter(r=>r.priority==='High').length;
-  document.getElementById('departments').textContent=new Set(reports.map(r=>r.department)).size;
-  const priorityCounts=['High','Medium','Low'].map(p=>[p,reports.filter(r=>r.priority===p).length]);
-  const deptMap={}; reports.forEach(r=>deptMap[r.department]=(deptMap[r.department]||0)+1);
-  const maxP=Math.max(1,...priorityCounts.map(x=>x[1]));
-  document.getElementById('priorityBars').innerHTML=priorityCounts.map(([k,v])=>`<div class="bar-row"><div class="bar-label"><span>${k}</span><b>${v}</b></div><div class="bar"><i style="width:${v/maxP*100}%"></i></div></div>`).join('');
-  const depts=Object.entries(deptMap).sort((a,b)=>b[1]-a[1]); const maxD=Math.max(1,...depts.map(x=>x[1]));
-  document.getElementById('departmentBars').innerHTML=depts.slice(0,5).map(([k,v])=>`<div class="bar-row"><div class="bar-label"><span>${k}</span><b>${v}</b></div><div class="bar"><i style="width:${v/maxD*100}%"></i></div></div>`).join('');
-  document.getElementById('recentReports').innerHTML=reports.slice(0,5).map(r=>`<div class="report"><strong>${r.id} · ${r.category}</strong><small>${r.location} · <span class="priority-${r.priority.toLowerCase()}">${r.priority}</span></small></div>`).join('');
-}
-
-function resetDemo(){reports=[...seedReports];document.getElementById('message').value='';document.getElementById('location').value='';document.getElementById('result').classList.add('hidden');document.getElementById('emptyState').classList.remove('hidden');document.getElementById('confidence').textContent='Waiting';document.getElementById('modeLabel').textContent='Prototype mode';document.getElementById('photoInput').value='';document.getElementById('fileName').textContent='Optional · JPG, PNG or WebP';renderDashboard();}
-
-document.getElementById('photoInput').addEventListener('change',()=>{const file=document.getElementById('photoInput').files[0];document.getElementById('fileName').textContent=file?file.name:'Optional · JPG, PNG or WebP';});
-renderDashboard();
+function $(id){return document.getElementById(id)}
+function setLoading(v){const b=$('analyzeButton');b.disabled=v;b.innerHTML=v?'<span class="spinner">◌</span> Analyzing civic signal…':'<span>✦</span> Analyze with CivicAI <b>Ctrl + Enter</b><span>→</span>'}
+function detectLanguage(text){if(/[\u0C00-\u0C7F]/.test(text))return'Telugu';if(/[\u0900-\u097F]/.test(text))return'Hindi';if(/[\u0B80-\u0BFF]/.test(text))return'Tamil';if(/[\u0C80-\u0CFF]/.test(text))return'Kannada';if(/[\u0A80-\u0AFF]/.test(text))return'Marathi';return'English'}
+function localAnalyze(message,location,language){const lower=message.toLowerCase();const match=rules.find(r=>r.keys.some(k=>lower.includes(k)))||{category:'General Public Service',department:'Citizen Services',priority:'Medium',reason:'The signal does not map confidently to a defined service. Human review is recommended before routing.',impact:'Uncertain',cluster:'No confident cluster',duplicate:.18,sla:'Review within 24 hours',tags:['needs review']};const detected=language==='Auto-detect'?detectLanguage(message):language;const confidence=match.category==='General Public Service'?.56:Math.min(.97,match.confidence||(.84+Math.random()*.1));const nearby=reports.filter(r=>r.category===match.category||r.department===match.department).length;return{summary:`${message.length>180?message.slice(0,177)+'…':message}${location&&location!=='Location not specified'?` Reported from ${location}.`:''}`,category:match.category,department:match.department,priority:match.priority,language:detected,confidence,reason:match.reason,impact:match.impact,cluster:nearby>1?match.cluster:'No strong cluster detected',duplicate:nearby>1?match.duplicate:.22,sla:match.sla,tags:match.tags,humanReview:confidence<.75||match.category==='General Public Service',signals:[{name:'Intent confidence',value:`${Math.round(confidence*100)}%`},{name:'Cluster signal',value:nearby>1?'Cross-report match':'No strong match'},{name:'Safety posture',value:match.priority==='High'?'Rapid human review':'Standard review'}]}}
+async function readImage(){const file=$('photoInput').files[0];if(!file)return null;return await new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve({data:String(reader.result).split(',')[1],mimeType:file.type,name:file.name});reader.onerror=reject;reader.readAsDataURL(file)})}
+async function analyzeIssue(){const message=$('message').value.trim();const location=$('location').value.trim()||'Location not specified';const language=$('language').value;if(!message){showToast('Add a citizen signal','Describe the issue before analysis.');return}setLoading(true);try{const image=await readImage();let result=null;try{const response=await fetch('/api/analyzeIssue',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message,location,language,imageData:image?.data||'',imageMimeType:image?.mimeType||''})});if(response.ok)result=await response.json()}catch(_){/* Spark plan: local fallback */}if(!result||result.error){result=localAnalyze(message,location,language);$('modeLabel').textContent='Prototype fallback'}else{$('modeLabel').textContent='Live Gemini + Firebase'}const item={id:'CIV-'+(1043+reports.length),category:result.category,department:result.department,priority:result.priority,location,summary:result.summary,tags:result.tags||[],confidence:result.confidence||.8,impact:result.impact||'Community-level',status:result.humanReview?'Needs human review':'Queued'};reports.unshift(item);renderResult(result);renderDashboard();showToast('Signal analyzed',`${result.category} · ${result.priority} priority · ${Math.round((result.confidence||0)*100)}% confidence`);$('analysisPanel').scrollIntoView({behavior:'smooth',block:'center'})}finally{setLoading(false)}}
+function renderResult(r){$('emptyState').classList.add('hidden');$('result').classList.remove('hidden');const pct=Math.round((r.confidence||0)*100);$('confidence').textContent=r.humanReview?'Human review recommended':`${pct}% confidence`;$('scoreValue').textContent=pct;$('scoreRing').style.background=`conic-gradient(#3567e8 ${pct}%, #e4ebf7 0)`;$('recommendation').textContent=r.priority==='High'?'Priority review':r.priority==='Medium'?'Department review':'Routine service review';$('decisionMeta').textContent=r.humanReview?'AI recommendation · authorized official verification required':'AI triage signal · verify before administrative action';$('summary').textContent=r.summary;$('category').textContent=r.category;$('department').textContent=r.department;$('priority').textContent=r.priority;$('detectedLanguage').textContent=r.language;$('slaText').textContent=r.sla||'Review window';$('impactValue').textContent=r.impact||'Uncertain';$('duplicateValue').textContent=r.cluster||'No strong cluster';$('reviewValue').textContent=r.humanReview?'Required':'Recommended';$('reason').textContent=r.reason;$('tags').innerHTML=(r.tags||[]).map(t=>`<span class="tag">#${t}</span>`).join('');$('signals').innerHTML=(r.signals||[]).map(s=>`<div class="signal"><span>${s.name}</span><b>${s.value}</b></div>`).join('')}
+function renderDashboard(){const total=reports.length,high=reports.filter(r=>r.priority==='High').length,depts=new Set(reports.map(r=>r.department)).size,avg=Math.round(reports.reduce((a,r)=>a+(r.confidence||.84),0)/Math.max(1,total)*100);$('totalIssues').textContent=total;$('urgentIssues').textContent=high;$('departments').textContent=depts;$('avgConfidence').textContent=avg+'%';const priority=[['High',high],['Medium',reports.filter(r=>r.priority==='Medium').length],['Low',reports.filter(r=>r.priority==='Low').length]];const maxP=Math.max(1,...priority.map(x=>x[1]));$('priorityBars').innerHTML=priority.map(([k,v])=>`<div class="priority-row ${k.toLowerCase()}"><div class="bar-label"><span>${k} priority</span><b>${v} cases</b></div><div class="bar"><i style="width:${v/maxP*100}%"></i></div></div>`).join('');const map={};reports.forEach(r=>map[r.department]=(map[r.department]||0)+1);const deptsSorted=Object.entries(map).sort((a,b)=>b[1]-a[1]);const maxD=Math.max(1,...deptsSorted.map(x=>x[1]));$('departmentBars').innerHTML=deptsSorted.slice(0,5).map(([k,v])=>`<div class="priority-row"><div class="bar-label"><span>${k}</span><b>${v}</b></div><div class="bar"><i style="width:${v/maxD*100}%"></i></div></div>`).join('');$('topDepartment').textContent=deptsSorted[0]?.[0]||'Water Services';renderTable()}
+function renderTable(filter=''){const q=filter.toLowerCase();const list=reports.filter(r=>`${r.id} ${r.category} ${r.department} ${r.location}`.toLowerCase().includes(q));$('recentReports').innerHTML=list.slice(0,8).map(r=>`<div class="case-row"><div class="case-main"><strong>${r.id}</strong><small>${r.summary.slice(0,58)}${r.summary.length>58?'…':''}</small></div><div class="case-service">${r.department}</div><div class="case-location">${r.location}</div><div><span class="priority-badge ${r.priority.toLowerCase()}">${r.priority}</span></div><div class="case-confidence"><div class="confidence-bar"><i style="width:${Math.round((r.confidence||.84)*100)}%"></i></div><small>${Math.round((r.confidence||.84)*100)}%</small></div><div><span class="status-badge"><i></i>${r.status||'Queued'}</span></div></div>`).join('')||'<div class="case-row"><span>No matching cases.</span></div>'}
+function usePrompt(text,loc){$('message').value=text;$('location').value=loc;$('message').dispatchEvent(new Event('input'));focusIntake()}
+function focusIntake(){$('message').focus();$('intakeSection').scrollIntoView({behavior:'smooth',block:'center'})}
+function scrollToSection(id){$(id).scrollIntoView({behavior:'smooth',block:'start'})}
+function showToast(title,text){$('toastTitle').textContent=title;$('toastText').textContent=text;$('toast').classList.add('show');clearTimeout(window.toastTimer);window.toastTimer=setTimeout(()=>$('toast').classList.remove('show'),3200)}
+function resetDemo(){reports=[...seedReports];$('message').value='';$('location').value='';$('result').classList.add('hidden');$('emptyState').classList.remove('hidden');$('confidence').textContent='Waiting';$('modeLabel').textContent='Prototype fallback';$('photoInput').value='';$('fileName').textContent='Optional · JPG, PNG or WebP';$('photoPreview').querySelector('.camera').textContent='▣';$('charCount').textContent='0 / 500';renderDashboard();showToast('Demo reset','Synthetic civic signals restored.')}
+function startVoice(){const Speech=window.SpeechRecognition||window.webkitSpeechRecognition;if(!Speech){showToast('Voice unavailable','Your browser does not expose speech recognition.');return}const recognition=new Speech();recognition.lang=$('language').value==='Telugu'?'te-IN':$('language').value==='Hindi'?'hi-IN':$('language').value==='Tamil'?'ta-IN':'en-IN';recognition.interimResults=false;$('voiceButton').textContent='● Listening…';recognition.onresult=e=>{$('message').value=e.results[0][0].transcript;$('message').dispatchEvent(new Event('input'));showToast('Voice captured','Review the transcript before submitting.')};recognition.onerror=()=>showToast('Voice input stopped','Please try again.');recognition.onend=()=>{$('voiceButton').textContent='🎙 Voice'};recognition.start()}
+function setupNav(){document.querySelectorAll('.nav-item').forEach(btn=>btn.addEventListener('click',()=>{document.querySelectorAll('.nav-item').forEach(x=>x.classList.remove('active'));btn.classList.add('active');const view=btn.dataset.view;const targets={overview:'overviewView',intake:'intakeSection',priorities:'prioritySection',queue:'queueSection',governance:'governanceSection'};const titles={overview:'Civic intelligence overview',intake:'Citizen intake',priorities:'Priority intelligence',queue:'Department queue',governance:'AI governance'};$('pageTitle').textContent=titles[view];$(targets[view]).scrollIntoView({behavior:'smooth',block:'start'})}))}
+$('message').addEventListener('input',()=>{$('charCount').textContent=`${$('message').value.length} / 500`});$('photoInput').addEventListener('change',()=>{const file=$('photoInput').files[0];$('fileName').textContent=file?file.name:'Optional · JPG, PNG or WebP';if(file){const img=document.createElement('img');img.src=URL.createObjectURL(file);img.alt='Attached civic evidence';img.style.cssText='width:34px;height:34px;border-radius:8px;object-fit:cover';$('photoPreview').querySelector('.camera').replaceWith(img)}});$('voiceButton').addEventListener('click',startVoice);$('locationButton').addEventListener('click',()=>{if(!navigator.geolocation){showToast('Location unavailable','Enter a ward manually.');return}navigator.geolocation.getCurrentPosition(p=>{$('location').value=`${p.coords.latitude.toFixed(3)}, ${p.coords.longitude.toFixed(3)}`;showToast('Location captured','Coordinates added locally to this report.')},()=>showToast('Location blocked','Enter your ward or area manually.')});$('reportSearch').addEventListener('input',e=>renderTable(e.target.value));document.querySelectorAll('.filter-pills button').forEach(btn=>btn.addEventListener('click',()=>{document.querySelectorAll('.filter-pills button').forEach(x=>x.classList.remove('active'));btn.classList.add('active');const f=btn.textContent;renderTable(f==='All'?'':f)}));$('helpButton').addEventListener('click',()=>$('helpModal').classList.remove('hidden'));$('modalClose').addEventListener('click',()=>$('helpModal').classList.add('hidden'));$('helpModal').addEventListener('click',e=>{if(e.target===$('helpModal'))$('helpModal').classList.add('hidden')});document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key==='Enter'){e.preventDefault();analyzeIssue()}});setupNav();renderDashboard();
