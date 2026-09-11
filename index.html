@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="CivicAI Governance — multilingual AI-assisted citizen intelligence for public services." />
+  <title>CivicAI Governance — JanMitra</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand"><span class="brand-mark">✦</span><div><strong>CivicAI</strong><small>Governance · JanMitra</small></div></div>
+    <span class="track-pill">Track 1 · Digital Public Infrastructure & Governance</span>
+    <div class="status"><span class="dot"></span> Prototype mode</div>
+  </header>
+
+  <main class="container">
+    <section class="hero">
+      <div>
+        <p class="eyebrow">AI-ASSISTED CIVIC INTELLIGENCE</p>
+        <h1>Turn citizen voices into <span>actionable priorities.</span></h1>
+        <p class="hero-copy">A multilingual, multimodal workflow for understanding citizen requests, routing them to the right service, and giving officials an explainable view of community priorities.</p>
+      </div>
+      <div class="hero-card"><div class="metric"><b id="totalIssues">0</b><span>reports analyzed</span></div><div class="metric"><b id="urgentIssues">0</b><span>high-priority</span></div><div class="metric"><b id="departments">0</b><span>service areas</span></div></div>
+    </section>
+
+    <section class="grid">
+      <article class="panel intake">
+        <div class="panel-head"><div><p class="eyebrow">CITIZEN INTAKE</p><h2>Report a community issue</h2></div><span class="ai-badge">AI READY</span></div>
+        <label>Message</label>
+        <textarea id="message" rows="5" placeholder="Describe the issue in English or an Indian language..."></textarea>
+        <div class="row">
+          <div><label>Language</label><select id="language"><option>Auto-detect</option><option>English</option><option>Hindi</option><option>Telugu</option><option>Tamil</option><option>Kannada</option><option>Marathi</option></select></div>
+          <div><label>Location</label><input id="location" placeholder="e.g. Ward 12, Hyderabad" /></div>
+        </div>
+        <div class="upload"><span>📷</span><div><strong>Photo evidence</strong><small>Optional · prototype placeholder</small></div><button type="button" onclick="alert('Photo upload is reserved for the production integration.')">Attach</button></div>
+        <button class="primary" onclick="analyzeIssue()">Analyze with CivicAI <span>→</span></button>
+        <p class="fineprint">Prototype uses synthetic analysis. Production mode will call a secure Gemini service; API keys are never placed in the browser.</p>
+      </article>
+
+      <article class="panel analysis">
+        <div class="panel-head"><div><p class="eyebrow">AI ANALYSIS</p><h2>Explainable recommendation</h2></div><span id="confidence" class="confidence">Waiting</span></div>
+        <div id="emptyState" class="empty"><div>✦</div><h3>Submit a citizen report</h3><p>The AI analysis will appear here with category, priority, routing, and an explanation.</p></div>
+        <div id="result" class="result hidden">
+          <div class="summary"><span>AI SUMMARY</span><p id="summary"></p></div>
+          <div class="result-grid">
+            <div><span>Category</span><strong id="category"></strong></div>
+            <div><span>Recommended department</span><strong id="department"></strong></div>
+            <div><span>Priority</span><strong id="priority"></strong></div>
+            <div><span>Detected language</span><strong id="detectedLanguage"></strong></div>
+          </div>
+          <div class="reason"><strong>Why this priority?</strong><p id="reason"></p></div>
+          <div class="tags" id="tags"></div>
+        </div>
+      </article>
+    </section>
+
+    <section class="panel dashboard">
+      <div class="panel-head"><div><p class="eyebrow">OFFICIAL VIEW</p><h2>Community priorities</h2></div><button class="secondary" onclick="resetDemo()">Reset demo</button></div>
+      <div class="dashboard-grid">
+        <div class="chart-card"><h3>Priority queue</h3><div id="priorityBars"></div></div>
+        <div class="chart-card"><h3>Service areas</h3><div id="departmentBars"></div></div>
+        <div class="chart-card"><h3>Recent reports</h3><div id="recentReports"></div></div>
+      </div>
+    </section>
+
+    <section class="principles">
+      <div><b>Human in the loop</b><span>AI recommends; authorized officials decide.</span></div>
+      <div><b>Privacy by design</b><span>Public dashboards should expose trends, not personal data.</span></div>
+      <div><b>Explainable AI</b><span>Every priority recommendation has visible signals.</span></div>
+      <div><b>Inclusive access</b><span>Designed for multilingual and voice-first participation.</span></div>
+    </section>
+  </main>
+  <footer>© 2026 CivicAI Governance · Hackathon prototype · Synthetic data only</footer>
+  <script src="app.js"></script>
+</body>
+</html>
