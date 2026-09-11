@@ -12,22 +12,6 @@
       "functions/**",
       "docs/**"
     ],
-    "rewrites": [
-      {
-        "source": "/api/analyzeIssue",
-        "function": {
-          "functionId": "analyzeIssue",
-          "region": "asia-south1"
-        }
-      },
-      {
-        "source": "/api/health",
-        "function": {
-          "functionId": "health",
-          "region": "asia-south1"
-        }
-      }
-    ],
     "cleanUrls": true,
     "trailingSlash": false
   },
