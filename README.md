@@ -56,7 +56,7 @@ The objective is **decision support, not autonomous government decision-making**
 
 ## 3. Why This Fits Track 1
 
-Code for Communities 2.0 describes Track 1 as **AI for Digital Public Infrastructure & Governance**, focused on improving public services, governance systems, citizen experiences, and digital infrastructure efficiency. CivicAI directly targets those areas through a reusable AI layer for citizen-to-government workflows. citehttps://gdg.community.dev/events/details/google-gdg-cloud-udaipur-presents-build-with-ai-code-for-communities-20-udaipur-edition/
+Code for Communities 2.0 defines Track 1 around using AI to improve public services, governance systems, citizen experiences, and digital public infrastructure. CivicAI directly targets those areas through a reusable AI layer for citizen-to-government workflows.
 
 ## 4. Core Features
 
@@ -188,10 +188,11 @@ civicai-governance/
 ├── docs/
 │   ├── ARCHITECTURE.md        # Technical architecture
 │   ├── DEMO_SCRIPT.md         # 2–3 minute demo narrative
+│   ├── GEMINI_INTEGRATION.md  # Secure AI integration plan
 │   └── SUBMISSION_CHECKLIST.md# Hackathon submission checklist
+├── .github/workflows/pages.yml# GitHub Pages deployment
 ├── .gitignore
 ├── CONTRIBUTING.md
-├── LICENSE
 └── README.md
 ```
 
@@ -218,6 +219,7 @@ Then open `http://localhost:8000`.
 - [x] Interactive prototype shell
 - [x] Synthetic civic dataset
 - [x] Demo narrative and architecture documentation
+- [x] Secure Gemini integration plan
 - [ ] Gemini API integration through a secure backend
 - [ ] Voice ingestion and transcription
 - [ ] Indian-language evaluation set
