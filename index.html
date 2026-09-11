@@ -4,6 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="description" content="CivicAI Governance — multilingual AI-assisted citizen intelligence for public services." />
+  <meta name="theme-color" content="#0b57d0" />
   <title>CivicAI Governance — JanMitra</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
@@ -11,7 +12,7 @@
   <header class="topbar">
     <div class="brand"><span class="brand-mark">✦</span><div><strong>CivicAI</strong><small>Governance · JanMitra</small></div></div>
     <span class="track-pill">Track 1 · Digital Public Infrastructure & Governance</span>
-    <div class="status"><span class="dot"></span> Prototype mode</div>
+    <div class="status"><span class="dot"></span> <span id="modeLabel">Prototype mode</span></div>
   </header>
 
   <main class="container">
@@ -26,16 +27,16 @@
 
     <section class="grid">
       <article class="panel intake">
-        <div class="panel-head"><div><p class="eyebrow">CITIZEN INTAKE</p><h2>Report a community issue</h2></div><span class="ai-badge">AI READY</span></div>
-        <label>Message</label>
+        <div class="panel-head"><div><p class="eyebrow">CITIZEN INTAKE</p><h2>Report a community issue</h2></div><span class="ai-badge">GEMINI READY</span></div>
+        <label for="message">Message</label>
         <textarea id="message" rows="5" placeholder="Describe the issue in English or an Indian language..."></textarea>
         <div class="row">
-          <div><label>Language</label><select id="language"><option>Auto-detect</option><option>English</option><option>Hindi</option><option>Telugu</option><option>Tamil</option><option>Kannada</option><option>Marathi</option></select></div>
-          <div><label>Location</label><input id="location" placeholder="e.g. Ward 12, Hyderabad" /></div>
+          <div><label for="language">Language</label><select id="language"><option>Auto-detect</option><option>English</option><option>Hindi</option><option>Telugu</option><option>Tamil</option><option>Kannada</option><option>Marathi</option></select></div>
+          <div><label for="location">Location</label><input id="location" placeholder="e.g. Ward 12, Hyderabad" /></div>
         </div>
-        <div class="upload"><span>📷</span><div><strong>Photo evidence</strong><small>Optional · prototype placeholder</small></div><button type="button" onclick="alert('Photo upload is reserved for the production integration.')">Attach</button></div>
-        <button class="primary" onclick="analyzeIssue()">Analyze with CivicAI <span>→</span></button>
-        <p class="fineprint">Prototype uses synthetic analysis. Production mode will call a secure Gemini service; API keys are never placed in the browser.</p>
+        <div class="upload"><span>📷</span><div><strong>Photo evidence</strong><small id="fileName">Optional · JPG, PNG or WebP</small></div><label class="secondary upload-button" for="photoInput">Attach</label><input id="photoInput" type="file" accept="image/png,image/jpeg,image/webp" hidden /></div>
+        <button class="primary" id="analyzeButton" onclick="analyzeIssue()">Analyze with CivicAI <span>→</span></button>
+        <p class="fineprint">Live mode sends the report to a secure Firebase function and Gemini. The Gemini API key is kept server-side. If the backend is not configured, the demo safely falls back to local synthetic analysis.</p>
       </article>
 
       <article class="panel analysis">
@@ -51,6 +52,7 @@
           </div>
           <div class="reason"><strong>Why this priority?</strong><p id="reason"></p></div>
           <div class="tags" id="tags"></div>
+          <div class="signals" id="signals"></div>
         </div>
       </article>
     </section>
