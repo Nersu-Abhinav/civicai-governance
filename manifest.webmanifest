@@ -1,0 +1,10 @@
+{
+  "name": "CivicAI Governance — JanMitra",
+  "short_name": "CivicAI",
+  "description": "AI-assisted multilingual civic intelligence for public-service workflows.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f7f9fc",
+  "theme_color": "#0b57d0",
+  "icons": []
+}
