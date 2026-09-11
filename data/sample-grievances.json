@@ -1,0 +1,6 @@
+[
+  {"id":"CIV-1042","category":"Roads & Mobility","department":"Roads Department","priority":"High","location":"Ward 12","language":"English","summary":"Multiple residents report a large pothole near the main junction.","status":"Under review"},
+  {"id":"CIV-1041","category":"Water Supply","department":"Water Services","priority":"High","location":"Ward 7","language":"English","summary":"Households report an interruption in water supply since yesterday.","status":"Assigned"},
+  {"id":"CIV-1040","category":"Waste Management","department":"Sanitation","priority":"Medium","location":"Ward 12","language":"English","summary":"Repeated garbage accumulation reported near a community market.","status":"Clustered"},
+  {"id":"CIV-1039","category":"Street Lighting","department":"Electrical Services","priority":"Low","location":"Ward 4","language":"English","summary":"Two streetlights are not functioning on a residential lane.","status":"Assigned"}
+]
